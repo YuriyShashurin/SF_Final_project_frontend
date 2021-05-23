@@ -2,18 +2,33 @@
   <div class="row main-wrap mb-5 d-flex flex-wrap">
     <div class="col-2 d-flex flex-column align-items-center" id="nav">
       <img alt="Our logo" id="logo" src="./assets/logo.png">
-      <router-link style="width: 100%" class="mt-3 mb-2" to="/login">
-        <button style="width: 100%" class="btn btn-info text-white text-uppercase">
-            Ввойдите
-        </button>
-      </router-link>
-      <router-link class="mb-5" to="/signup">или зарегестрируйтесь</router-link>
+      <div v-if="!$store.state.user">
+        <router-link style="width: 100%" class="mt-3 mb-2" to="/login">
+          <button style="width: 100%" class="btn btn-info text-white text-uppercase">
+              Ввойдите
+          </button>
+        </router-link>
+        <router-link class="mb-5" to="/signup">или зарегестрируйтесь</router-link>
+      </div>
+      <div v-else class="mb-4">
+        <h3>{{ $store.state.user }}</h3>
+        <div v-if="$store.state.isStaff = true">
+          <span class="badge rounded-pill bg-primary text-white">Администратор</span>
+        </div>
+        <div v-else>
+          <span class="badge rounded-pill bg-primary text-white">Работник</span>
+        </div>
+        <small>
+          <router-link to="logout">Выйти</router-link>
+        </small>
+
+      </div>
       <router-link class="mb-3" to="/">Главная</router-link>
       <router-link class="mb-3" to="/user_area/surveys">Доступные опросы</router-link>
       <router-link class="mb-3" to="/user_area/stats">Статистика</router-link>
     </div>
     <div class="col-10 main-block-size">
-      <header class="d-flex header">
+      <header class="d-flex header mb-3">
         <h5>Главная</h5>
       </header>
       <router-view/>

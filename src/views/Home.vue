@@ -5,13 +5,18 @@
 </template>
 
 <script>
-// @ is an alias to /src
-// import HelloWorld from '@/components/HelloWorld.vue';
+// eslint-disable-next-line import/no-cycle
+import router from '../router';
 
 export default {
   name: 'Home',
-  // components: {
-  //   HelloWorld,
-  // },
+  created() {
+    if (!this.$store.state.user) {
+      this.$cookies.remove('jwt_token');
+      this.$cookies.remove('jwt_token_refresh');
+      router.push({ path: '/login' });
+    }
+  },
 };
+
 </script>

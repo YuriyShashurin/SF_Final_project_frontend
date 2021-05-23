@@ -23,10 +23,11 @@
 
 <script>
 import axios from 'axios';
+// eslint-disable-next-line no-unused-vars
+import jwtDecode from 'jwt-decode';
 import router from '../router';
 
 const AUTH_URL = 'http://localhost:8080/api/token/';
-const AUTH_URL2 = 'http://localhost:8080/api/users/';
 
 export default {
   name: 'Login',
@@ -34,16 +35,12 @@ export default {
     return {
       username: '',
       password: '',
+      decode_data: [],
     };
   },
   methods: {
-    CheckForm(event) {
-      event.preventDefault();
-      alert(this.username);
-      alert(this.password);
-      router.push({ path: '/' });
-    },
     onSubmit(event) {
+      // const username1 = this.username;
       event.preventDefault();
       const requestData = {
         username: this.username,
@@ -57,29 +54,27 @@ export default {
       axios.post(AUTH_URL, requestData, config)
         .then((response) => {
           this.$cookies.set('jwt_token', response.data.access);
-          console.log(response.data.access);
-          console.log('Token set');
+          this.$cookies.set('jwt_token_refresh', response.data.refresh);
+          console.log(jwtDecode(response.data.access));
+          const decodeToken = jwtDecode(response.data.access);
+          console.log(decodeToken);
+          const username = decodeToken.name;
+          console.log(username);
+          const status = decodeToken.isStaff;
+          console.log(status);
+          const payload = { username, status };
+          this.$store.dispatch('login', payload);
+          router.push({ path: '/' });
         });
-      this.getUserInfo();
       this.username = '';
       this.password = '';
     },
-    getUserInfo() {
-      const jwt = this.$cookies.get('jwt_token');
-      // const config = {
-      //   headers: {
-      //     Authorization: `Bearer ${jwt}`,
-      //     'X-CSRFToken': this.$cookies.get('csrftoken'),
-      //   },
-      // };
-      const requestData = {
-        token: jwt,
-      };
-      axios.get(AUTH_URL2, requestData)
-        .then((response) => {
-          alert(response.data);
-        });
-    },
+  },
+  mounted() {
+    if (!this.$store.state.user && this.$cookies.get('jwt_token')) {
+      this.$cookies.remove('jwt_token');
+      this.$cookies.remove('jwt_token_refresh');
+    }
   },
 };
 </script>
