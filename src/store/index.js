@@ -1,29 +1,42 @@
 import { createStore } from 'vuex';
+import createPersistedState from 'vuex-persistedstate';
 
 export default createStore({
   state: {
-    user: null,
+    username: null,
+    userID: null,
     isLoggedIn: false,
     isStaff: null,
   },
   mutations: {
     loginSuccess(state, payload) {
-      state.user = payload.username;
+      state.username = payload.username;
+      state.userID = payload.userID;
       state.isLoggedIn = true;
       state.isStaff = payload.status;
     },
-    logout(state) {
-      state.user = null;
+    logoutUser(state) {
+      state.username = null;
+      state.userID = null;
       state.isLoggedIn = false;
       state.isStaff = null;
     },
   },
   actions: {
     login: ({ commit }, payload) => {
-      console.log(payload);
       commit('loginSuccess', payload);
+    },
+    logout: ({ commit }) => {
+      localStorage.removeItem('jwt_token');
+      localStorage.removeItem('jwt_token_refresh');
+      commit('logoutUser');
     },
   },
   modules: {
   },
+  getters: {
+    getUserName: (state) => state.user,
+    getUserId: (state) => state.userID,
+  },
+  plugins: [createPersistedState()],
 });

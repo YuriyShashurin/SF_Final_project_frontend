@@ -53,16 +53,14 @@ export default {
       };
       axios.post(AUTH_URL, requestData, config)
         .then((response) => {
-          this.$cookies.set('jwt_token', response.data.access);
-          this.$cookies.set('jwt_token_refresh', response.data.refresh);
-          console.log(jwtDecode(response.data.access));
+          localStorage.setItem('jwt_token', response.data.access);
+          localStorage.setItem('jwt_token_refresh', response.data.refresh);
           const decodeToken = jwtDecode(response.data.access);
           console.log(decodeToken);
           const username = decodeToken.name;
-          console.log(username);
+          const userID = decodeToken.user_id;
           const status = decodeToken.isStaff;
-          console.log(status);
-          const payload = { username, status };
+          const payload = { username, status, userID };
           this.$store.dispatch('login', payload);
           router.push({ path: '/' });
         });
@@ -71,9 +69,12 @@ export default {
     },
   },
   mounted() {
-    if (!this.$store.state.user && this.$cookies.get('jwt_token')) {
-      this.$cookies.remove('jwt_token');
-      this.$cookies.remove('jwt_token_refresh');
+    if (!this.$store.state.user) {
+      // this.$cookies.remove('jwt_token');
+      // this.$cookies.remove('jwt_token_refresh');
+      localStorage.removeItem('jwt_token');
+      localStorage.removeItem('jwt_token_refresh');
+      router.push({ path: '/login' });
     }
   },
 };

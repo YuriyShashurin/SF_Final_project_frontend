@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <h3>Dfsdfs</h3>
+    <h3>Главная страница</h3>
   </div>
 </template>
 
@@ -10,10 +10,10 @@ import router from '../router';
 
 export default {
   name: 'Home',
-  created() {
-    if (!this.$store.state.user) {
-      this.$cookies.remove('jwt_token');
-      this.$cookies.remove('jwt_token_refresh');
+  mounted() {
+    if (!this.$store.state.username) {
+      localStorage.removeItem('jwt_token');
+      localStorage.removeItem('jwt_token_refresh');
       router.push({ path: '/login' });
     }
   },

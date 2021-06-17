@@ -8,7 +8,7 @@
          :key="survey.id">
       <h5 class="card-title">Новый опрос: {{survey.title}}</h5>
       <p class="card-text">{{survey.description}}</p>
-      <router-link :to="{ name: 'SelectedSurvey', params: { id: survey.id }}"
+      <router-link :to="{ name: 'SelectedSurvey', params: { id: survey.id } }"
                    class="btn btn-primary">
         Начать опрос
       </router-link>
@@ -26,11 +26,16 @@ export default {
   data() {
     return {
       survey_list: {},
+      userId: null,
     };
+  },
+  created() {
+    this.userId = this.$store.getters.getUserId;
   },
   methods: {
     getSurveyList() {
-      const jwt = this.$cookies.get('jwt_token');
+      // const jwt = this.$cookies.get('jwt_token');
+      const jwt = localStorage.getItem('jwt_token');
       const config = {
         headers: {
           Authorization: `Bearer ${jwt}`,
@@ -44,7 +49,7 @@ export default {
       });
     },
   },
-  created() {
+  mounted() {
     this.getSurveyList();
   },
 };

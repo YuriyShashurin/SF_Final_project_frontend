@@ -18,6 +18,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/Login.vue'),
   },
   {
+    path: '/logout',
+    name: 'Logout',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Logout.vue'),
+  },
+  {
     path: '/signup',
     name: 'Signup',
     component: () => import(/* webpackChunkName: "about" */ '../views/Signup.vue'),
@@ -31,6 +36,11 @@ const routes = [
     path: '/user_area/surveys/:id',
     name: 'SelectedSurvey',
     component: () => import(/* webpackChunkName: "about" */ '../views/Poll.vue'),
+  },
+  {
+    path: '/complete_survey/:id',
+    name: 'SuccessPoll',
+    component: () => import(/* webpackChunkName: "about" */ '../views/SuccessPoll.vue'),
   },
 ];
 
