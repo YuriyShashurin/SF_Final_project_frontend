@@ -1,5 +1,6 @@
 <template>
-  <h4 class="mb-5">{{projectName}}</h4>
+  <h4 class="mb-2">{{projectName}}</h4>
+  <h5 class="mb-2 text-danger">{{ testtext }}</h5>
   <div class="d-flex flex-column align-content-start">
     <h5 class="text-danger">{{ error_text }}</h5>
     <div v-for="question in limitedQuestions" :key="question.id" class="mb-5">
@@ -80,6 +81,8 @@ export default {
       surveyId: null,
       userId: null,
       projectStatus: [],
+      usetest: false,
+      testtext: '',
     };
   },
   methods: {
@@ -92,7 +95,6 @@ export default {
       };
       axios.get(`${BASE_API_URL}/projects/${this.$route.params.id}/`, config).then((response) => {
         this.surveyData = response.data.question;
-        console.log(this.surveyData);
         this.projectName = response.data.title;
         this.maxNumber = this.surveyData.length;
         this.completeCode = response.data.complete_code;
@@ -133,6 +135,7 @@ export default {
       }
     },
     addLastQuestion(startNumber) {
+      console.log('addLastQuestion');
       const jwt = localStorage.getItem('jwt_token');
       const config = {
         headers: {
@@ -157,18 +160,24 @@ export default {
         this.radioAnswer = null;
         this.checkboxAnswers = [];
         this.error_text = '';
-        if (questionType === 'single') {
-          this.sendAnswerData(questionId, answerId);
-        } else {
-          this.sendMultipleAnswerData(questionId, answerId);
+        if (this.usetest === false) {
+          if (questionType === 'single') {
+            this.sendAnswerData(questionId, answerId);
+          } else {
+            this.sendMultipleAnswerData(questionId, answerId);
+          }
+          this.addLastQuestion(this.startNumber);
         }
-        this.addLastQuestion(this.startNumber);
         if (this.startNumber === this.maxNumber) {
           this.startNumber = 0;
           this.limitNumber = 1;
           this.maxNumber = null;
           this.surveyId = '';
-          router.push({ name: 'SuccessPoll', query: { q: this.completeCode, resp: this.userId } });
+          if (this.usetest === false) {
+            router.push({ name: 'SuccessPoll', query: { q: this.completeCode, resp: this.userId } });
+          } else {
+            router.push({ name: 'ProjectDetails', params: { id: this.$route.params.id } });
+          }
         }
       }
     },
@@ -189,7 +198,6 @@ export default {
           if (response.data.status === 'Completed') {
             router.push({ name: 'YetComplete' });
           } else {
-            console.log('Status уже присутствует');
             this.projectStatus = response.data;
             this.startNumber = this.projectStatus.last_question;
             this.limitNumber = this.startNumber + 1;
@@ -214,7 +222,15 @@ export default {
     },
   },
   mounted() {
-    this.checkSurveyStatus();
+    if (this.$route.query.usetest) {
+      this.usetest = true;
+    }
+    if (this.usetest === true) {
+      this.testtext = 'Внимание. Вы проходите тестовую версию анкеты. Результаты не сохраняются';
+      console.log('тестовая анкета');
+    } else {
+      this.checkSurveyStatus();
+    }
     this.getSurveyData();
   },
 };

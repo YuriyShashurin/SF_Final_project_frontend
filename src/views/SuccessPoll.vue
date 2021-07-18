@@ -21,6 +21,15 @@ export default {
     };
   },
   methods: {
+    deleteComplete(config) {
+      const projectID = this.$route.params.id;
+      const userID = this.$route.query.resp;
+      const Id = `${projectID}_${userID}`;
+      axios.delete(`${BASE_API_URL}/project_status/${Id}/`, config)
+        .then((res) => {
+          console.log(res);
+        });
+    },
     setComleteStatus() {
       this.infoText = 'Поздравляем. Вы успешно завершили данное интервью';
       const projectID = this.$route.params.id;
@@ -60,6 +69,7 @@ export default {
           if (this.completeCode === status) {
             this.setComleteStatus();
           } else {
+            this.deleteComplete(config);
             this.infoText = 'Обнаружено несоотвествие. Ответы не засчитаны.';
           }
         });

@@ -60,9 +60,14 @@ export default {
           const username = decodeToken.name;
           const userID = decodeToken.user_id;
           const status = decodeToken.isStaff;
+          console.log(status);
           const payload = { username, status, userID };
           this.$store.dispatch('login', payload);
-          router.push({ path: '/' });
+          if (status === false) {
+            router.push({ path: '/' });
+          } else {
+            router.push({ path: '/admin-area/main' });
+          }
         });
       this.username = '';
       this.password = '';
@@ -70,8 +75,6 @@ export default {
   },
   mounted() {
     if (!this.$store.state.user) {
-      // this.$cookies.remove('jwt_token');
-      // this.$cookies.remove('jwt_token_refresh');
       localStorage.removeItem('jwt_token');
       localStorage.removeItem('jwt_token_refresh');
       router.push({ path: '/login' });

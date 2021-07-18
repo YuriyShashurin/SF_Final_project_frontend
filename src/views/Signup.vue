@@ -71,7 +71,7 @@ export default {
         first_name: this.first_name,
         last_name: this.last_name,
         email: this.email,
-        is_active: false,
+        is_active: true,
       };
 
       const csrf = this.$cookies.get('csrftoken');
