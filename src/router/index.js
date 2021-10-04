@@ -43,6 +43,11 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/SuccessPoll.vue'),
   },
   {
+    path: '/yet_complete',
+    name: 'YetComplete',
+    component: () => import(/* webpackChunkName: "about" */ '../views/YetComplete.vue'),
+  },
+  {
     path: '/admin-area/main',
     name: 'MainAdminArea',
     component: () => import(/* webpackChunkName: "about" */ '../views/admin-area/Main.vue'),

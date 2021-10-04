@@ -1,6 +1,7 @@
 <template>
   <div class="container">
-    Данная анкета уже была вами пройдена<br>
+    <h6>Данная анкета уже была вами пройдена</h6>
+    <router-link to="/user_area/surveys">Проверьте другие доступные опросы</router-link>
   </div>
 </template>
 

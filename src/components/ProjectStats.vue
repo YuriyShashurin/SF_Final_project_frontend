@@ -56,8 +56,10 @@
 
 <script>
 import axios from 'axios';
+import router from '../router';
 
-const BASE_API_URL = 'http://localhost:8080/api';
+const BASE_DOWNLOAD_FILE_URL = process.env.VUE_APP_BASE_DOWNLOAD_URL;
+const BASE_API_URL = process.env.VUE_APP_BASE_API_URL;
 
 export default {
   name: 'ProjectStats',
@@ -67,7 +69,7 @@ export default {
   data() {
     return {
       href: '',
-      defaultHref: 'http://127.0.0.1:8080/download/project/',
+      defaultHref: `${BASE_DOWNLOAD_FILE_URL}/project/`,
       jwt: null,
       statusData: [],
       projectStatusData: [],
@@ -100,6 +102,18 @@ export default {
             if (Number(this.id) === Number(element.project)) {
               this.projectStatusData.push(element);
             }
+          }).catch((e) => {
+            if (e.response.status === 401) {
+              const tokenRefresh = localStorage.getItem('jwt_token_refresh');
+              this.$store.dispatch('refreshToken', tokenRefresh);
+              const isLogged = this.$store.getters.getIsLoggedIn;
+              if (isLogged !== true) {
+                router.push({ path: '/login', query: { text: 'true' } });
+              } else {
+                console.log('refreshToken');
+                this.getInterviewsData();
+              }
+            }
           });
           this.setStats();
         });
@@ -108,11 +122,31 @@ export default {
       axios.delete(`${BASE_API_URL}/project_status/${id}/`)
         .catch((e) => {
           console.log('error', e);
+        })
+        .catch((e) => {
+          if (e.response.status === 401) {
+            const tokenRefresh = localStorage.getItem('jwt_token_refresh');
+            this.$store.dispatch('refreshToken', tokenRefresh);
+            const isLogged = this.$store.getters.getIsLoggedIn;
+            if (isLogged !== true) {
+              router.push({ path: '/login', query: { text: 'true' } });
+            } else {
+              console.log('refreshToken');
+              this.deleteParticipation(id);
+            }
+          }
         });
     },
   },
   mounted() {
-    this.href = `http://127.0.0.1:8080/download/project/${this.id}/`;
+    const isLogIn = this.$store.getters.getIsLoggedIn;
+    console.log(isLogIn);
+    if (isLogIn !== true) {
+      console.log('не авторизован');
+      this.$store.dispatch('logout');
+      router.push({ path: '/login', query: { text: 'true' } });
+    }
+    this.href = `${BASE_DOWNLOAD_FILE_URL}/project/${this.id}/`;
     this.csrf = this.$cookies.get('csrftoken');
     this.jwt = localStorage.getItem('jwt_token');
     this.config = {

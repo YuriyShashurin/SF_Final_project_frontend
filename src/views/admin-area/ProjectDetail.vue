@@ -142,7 +142,7 @@ import axios from 'axios';
 import router from '../../router';
 import ProjectStats from '../../components/ProjectStats.vue';
 
-const BASE_API_URL = 'http://localhost:8080/api';
+const BASE_API_URL = process.env.VUE_APP_BASE_API_URL;
 
 export default {
   name: 'ProjectDetail',
@@ -188,6 +188,19 @@ export default {
       axios.delete(`${BASE_API_URL}/surveys/${Id}/`, config)
         .then(() => {
           this.getProjectData();
+        })
+        .catch((e) => {
+          if (e.response.status === 401) {
+            const tokenRefresh = localStorage.getItem('jwt_token_refresh');
+            this.$store.dispatch('refreshToken', tokenRefresh);
+            const isLogged = this.$store.getters.getIsLoggedIn;
+            if (isLogged !== true) {
+              router.push({ path: '/login', query: { text: 'true' } });
+            } else {
+              console.log('refreshToken');
+              this.deleteQuestionInProject(questionId);
+            }
+          }
         });
     },
     getProjectData() {
@@ -208,8 +221,19 @@ export default {
           this.lifeTimeValue = response.data.life_time_value;
           this.isActive = response.data.is_active;
           this.questions = response.data.question;
-        }).catch((e) => {
-          console.log('Error', e);
+        })
+        .catch((e) => {
+          if (e.response.status === 401) {
+            const tokenRefresh = localStorage.getItem('jwt_token_refresh');
+            this.$store.dispatch('refreshToken', tokenRefresh);
+            const isLogged = this.$store.getters.getIsLoggedIn;
+            if (isLogged !== true) {
+              router.push({ path: '/login', query: { text: 'true' } });
+            } else {
+              console.log('refreshToken');
+              this.getProjectData();
+            }
+          }
         });
     },
     saveChanges() {
@@ -239,11 +263,28 @@ export default {
           router.push('/admin-area/main');
         })
         .catch((e) => {
-          console.log(e);
+          if (e.response.status === 401) {
+            const tokenRefresh = localStorage.getItem('jwt_token_refresh');
+            this.$store.dispatch('refreshToken', tokenRefresh);
+            const isLogged = this.$store.getters.getIsLoggedIn;
+            if (isLogged !== true) {
+              router.push({ path: '/login', query: { text: 'true' } });
+            } else {
+              console.log('refreshToken');
+              this.saveChanges();
+            }
+          }
         });
     },
   },
   mounted() {
+    const isLogIn = this.$store.getters.getIsLoggedIn;
+    console.log(isLogIn);
+    if (isLogIn !== true) {
+      console.log('не авторизован');
+      this.$store.dispatch('logout');
+      router.push({ path: '/login', query: { text: 'true' } });
+    }
     this.projectId = this.$route.params.id;
     this.jwt = localStorage.getItem('jwt_token');
     this.getProjectData();

@@ -27,6 +27,12 @@
           <option value="multiple">Возможно несколько ответов</option>
         </select>
       </div>
+      <div class="mt-2">
+        <label for="weight" class="form-label">
+          Баллы за заполнение вопроса (Вес вопроса)
+        </label>
+        <input type="number" v-model="questionWeight" class="form-control" id="weight">
+      </div>
     </form>
     <div class="col-4">
       <h5 class="mb-4">Добавление вариантов ответов</h5>
@@ -36,7 +42,7 @@
           <input type="text" v-model="newText" class="form-control" id="newText">
         </div>
         <div>
-          <label for="title" class="newValue">Значение (вес)</label>
+          <label for="title" class="newValue">Значение варианта ответа (вес)</label>
           <input type="number" v-model="newValue" class="form-control" id="newValue">
         </div>
         <button @click="addAnswer" class="btn btn-sm btn-secondary mt-3">Добавить вариант</button>
@@ -56,7 +62,7 @@
 import axios from 'axios';
 import router from '../../router';
 
-const BASE_API_URL = 'http://localhost:8080/api';
+const BASE_API_URL = process.env.VUE_APP_BASE_API_URL;
 
 export default {
   name: 'AddQuestion',
@@ -74,6 +80,7 @@ export default {
       newValue: null,
       questionId: null,
       type_display: '',
+      questionWeight: 0,
     };
   },
   methods: {
@@ -87,7 +94,17 @@ export default {
 
       axios.get(`${BASE_API_URL}/questions/`, config)
         .catch((e) => {
-          console.log('error', e);
+          if (e.response.status === 401) {
+            const tokenRefresh = localStorage.getItem('jwt_token_refresh');
+            this.$store.dispatch('refreshToken', tokenRefresh);
+            const isLogged = this.$store.getters.getIsLoggedIn;
+            if (isLogged !== true) {
+              router.push({ path: '/login', query: { text: 'true' } });
+            } else {
+              console.log('refreshToken');
+              this.getQuestionsAnwersData();
+            }
+          }
         })
         .then((response) => {
           this.questionsList = response.data;
@@ -97,13 +114,24 @@ export default {
       const surveyData = {
         project: this.projectId,
         question: this.questionId,
-        weight: 1,
+        weight: this.questionWeight,
       };
       axios.post(`${BASE_API_URL}/surveys/`, surveyData, config)
         .then(() => {
+          this.questionWeight = 0;
         })
         .catch((e) => {
-          console.log(e.response);
+          if (e.response.status === 401) {
+            const tokenRefresh = localStorage.getItem('jwt_token_refresh');
+            this.$store.dispatch('refreshToken', tokenRefresh);
+            const isLogged = this.$store.getters.getIsLoggedIn;
+            if (isLogged !== true) {
+              router.push({ path: '/login', query: { text: 'true' } });
+            } else {
+              console.log('refreshToken');
+              this.addQuestionInProject(questionId, config);
+            }
+          }
         });
     },
     createQuestion() {
@@ -134,7 +162,17 @@ export default {
           router.push({ name: 'ProjectDetails', params: { id: this.projectId } });
         })
         .catch((e) => {
-          console.log(e.response);
+          if (e.response.status === 401) {
+            const tokenRefresh = localStorage.getItem('jwt_token_refresh');
+            this.$store.dispatch('refreshToken', tokenRefresh);
+            const isLogged = this.$store.getters.getIsLoggedIn;
+            if (isLogged !== true) {
+              router.push({ path: '/login', query: { text: 'true' } });
+            } else {
+              console.log('refreshToken');
+              this.createQuestion();
+            }
+          }
         });
     },
     addAnswer() {
@@ -162,11 +200,28 @@ export default {
           this.newValue = '';
         })
         .catch((e) => {
-          console.log(e.response);
+          if (e.response.status === 401) {
+            const tokenRefresh = localStorage.getItem('jwt_token_refresh');
+            this.$store.dispatch('refreshToken', tokenRefresh);
+            const isLogged = this.$store.getters.getIsLoggedIn;
+            if (isLogged !== true) {
+              router.push({ path: '/login', query: { text: 'true' } });
+            } else {
+              console.log('refreshToken');
+              this.addAnswer();
+            }
+          }
         });
     },
   },
   mounted() {
+    const isLogIn = this.$store.getters.getIsLoggedIn;
+    console.log(isLogIn);
+    if (isLogIn !== true) {
+      console.log('не авторизован');
+      this.$store.dispatch('logout');
+      router.push({ path: '/login', query: { text: 'true' } });
+    }
     this.projectId = this.$route.query.ProjectId;
     this.projectTitle = this.$route.query.ProjectTitle;
     this.getQuestionsAnwersData();

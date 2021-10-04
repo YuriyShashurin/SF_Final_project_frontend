@@ -42,7 +42,7 @@
 import axios from 'axios';
 import router from '../router';
 
-const BASE_API_URL = 'http://localhost:8080/api';
+const BASE_API_URL = process.env.VUE_APP_BASE_API_URL;
 
 export default {
   name: 'Signup',
@@ -82,15 +82,25 @@ export default {
       };
 
       axios.post(`${BASE_API_URL}/users/`, requestData, config)
-        .then((response) => console.log(response.data))
-        .catch((e) => console.log(e.response));
-
-      this.username = '';
-      this.password_check = '';
-      this.password = '';
-      this.last_name = '';
-      this.first_name = '';
-      router.push({ path: '/' });
+        .then((response) => {
+          console.log('asd');
+          console.log(response);
+          this.username = '';
+          this.password_check = '';
+          this.password = '';
+          this.last_name = '';
+          this.first_name = '';
+          router.push({ path: '/' });
+        })
+        .catch((e) => {
+          console.log(e);
+          this.alert_message = 'Введены неверные данные. Попробуйте снова';
+          this.username = '';
+          this.password_check = '';
+          this.password = '';
+          this.last_name = '';
+          this.first_name = '';
+        });
     },
     CheckForm(event) {
       this.alert_message = '';

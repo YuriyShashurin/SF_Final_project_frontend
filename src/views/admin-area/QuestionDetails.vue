@@ -47,8 +47,9 @@
 
 <script>
 import axios from 'axios';
+import router from '../../router';
 
-const BASE_API_URL = 'http://localhost:8080/api';
+const BASE_API_URL = process.env.VUE_APP_BASE_API_URL;
 
 export default {
   name: 'QuestionsDetails',
@@ -72,12 +73,30 @@ export default {
           this.help_desc = response.data.help_desc;
           this.answerOption = response.data.answer_option;
           this.type_display = response.data.type_display;
-        }).catch((e) => {
-          console.log('Error', e);
+        })
+        .catch((e) => {
+          if (e.response.status === 401) {
+            const tokenRefresh = localStorage.getItem('jwt_token_refresh');
+            this.$store.dispatch('refreshToken', tokenRefresh);
+            const isLogged = this.$store.getters.getIsLoggedIn;
+            if (isLogged !== true) {
+              router.push({ path: '/login', query: { text: 'true' } });
+            } else {
+              console.log('refreshToken');
+              this.getQuestionData();
+            }
+          }
         });
     },
   },
   mounted() {
+    const isLogIn = this.$store.getters.getIsLoggedIn;
+    console.log(isLogIn);
+    if (isLogIn !== true) {
+      console.log('не авторизован');
+      this.$store.dispatch('logout');
+      router.push({ path: '/login', query: { text: 'true' } });
+    }
     this.jwt = localStorage.getItem('jwt_token');
     this.getConfig = {
       headers: {

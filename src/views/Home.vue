@@ -1,6 +1,5 @@
 <template>
   <div class="home">
-    <h3>Главная страница</h3>
   </div>
 </template>
 
@@ -9,14 +8,21 @@
 import router from '../router';
 
 export default {
-  name: 'Home',
   mounted() {
-    if (!this.$store.state.username) {
-      localStorage.removeItem('jwt_token');
-      localStorage.removeItem('jwt_token_refresh');
-      router.push({ path: '/login' });
+    const isLogIn = this.$store.getters.getIsLoggedIn;
+    console.log(isLogIn);
+    if (isLogIn !== true) {
+      console.log('не авторизован');
+      this.$store.dispatch('logout');
+      router.push({ path: '/login', query: { text: 'true' } });
+    } else {
+      const status = this.$store.getters.getIsStaff;
+      if (status === false) {
+        router.push({ path: '/user_area/surveys' });
+      } else {
+        router.push({ path: '/admin-area/main' });
+      }
     }
   },
 };
-
 </script>

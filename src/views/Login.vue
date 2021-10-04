@@ -1,7 +1,9 @@
 <template>
   <div class="login">
     <div class="container d-flex flex-column align-items-center">
-      <h2>Войдите в систему:</h2>
+      <h2 class="mb-3">Войдите в систему:</h2>
+      <div class="text-danger"> {{ errorText }}</div>
+      <div class="text-danger"> {{ info }}</div>
       <form style="width: 50%" class="mb-3 d-flex flex-column align-items-center"
             @submit="onSubmit" @keydown.enter="onSubmit" action="">
           <div class="mt-2" style="width: 100%">
@@ -27,7 +29,7 @@ import axios from 'axios';
 import jwtDecode from 'jwt-decode';
 import router from '../router';
 
-const AUTH_URL = 'http://localhost:8080/api/token/';
+const AUTH_URL = process.env.VUE_APP_AUTH_URL;
 
 export default {
   name: 'Login',
@@ -36,11 +38,12 @@ export default {
       username: '',
       password: '',
       decode_data: [],
+      errorText: '',
+      info: '',
     };
   },
   methods: {
     onSubmit(event) {
-      // const username1 = this.username;
       event.preventDefault();
       const requestData = {
         username: this.username,
@@ -53,20 +56,34 @@ export default {
       };
       axios.post(AUTH_URL, requestData, config)
         .then((response) => {
-          localStorage.setItem('jwt_token', response.data.access);
-          localStorage.setItem('jwt_token_refresh', response.data.refresh);
+          console.log(response.data);
+          const jwtAccess = response.data.access;
+          const jwtRefresh = response.data.refresh;
+          localStorage.setItem('jwt_token', jwtAccess);
+          console.log(jwtRefresh);
+          localStorage.setItem('jwt_token_refresh', jwtRefresh);
           const decodeToken = jwtDecode(response.data.access);
-          console.log(decodeToken);
           const username = decodeToken.name;
           const userID = decodeToken.user_id;
           const status = decodeToken.isStaff;
-          console.log(status);
-          const payload = { username, status, userID };
+          const payload = {
+            username,
+            status,
+            userID,
+            jwtAccess,
+            jwtRefresh,
+          };
           this.$store.dispatch('login', payload);
           if (status === false) {
-            router.push({ path: '/' });
+            router.push({ path: '/user_area/surveys' });
           } else {
             router.push({ path: '/admin-area/main' });
+          }
+        }).catch((e) => {
+          if (e.status === 404) {
+            this.errorText = 'Пользователь с такими данным не найден';
+          } else {
+            this.errorText = 'Системая ошибка. Попробуйте позже';
           }
         });
       this.username = '';
@@ -78,6 +95,9 @@ export default {
       localStorage.removeItem('jwt_token');
       localStorage.removeItem('jwt_token_refresh');
       router.push({ path: '/login' });
+    }
+    if (this.$route.query.text === 'true') {
+      this.info = 'Ваш сеанс авторизации истек. Войдите заново';
     }
   },
 };

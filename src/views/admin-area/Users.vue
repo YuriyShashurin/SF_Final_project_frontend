@@ -37,8 +37,9 @@
 
 <script>
 import axios from 'axios';
+import router from '../../router';
 
-const BASE_API_URL = 'http://localhost:8080/api';
+const BASE_API_URL = process.env.VUE_APP_BASE_API_URL;
 
 export default {
   name: 'Users',
@@ -57,12 +58,22 @@ export default {
       };
 
       axios.get(`${BASE_API_URL}/users/`, config)
-        .catch((e) => {
-          console.log('error', e);
-        })
         .then((response) => {
           this.users = response.data;
           console.log(this.users);
+        })
+        .catch((e) => {
+          if (e.response.status === 401) {
+            const tokenRefresh = localStorage.getItem('jwt_token_refresh');
+            this.$store.dispatch('refreshToken', tokenRefresh);
+            const isLogged = this.$store.getters.getIsLoggedIn;
+            if (isLogged !== true) {
+              router.push({ path: '/login', query: { text: 'true' } });
+            } else {
+              console.log('refreshToken');
+              this.getUsersList();
+            }
+          }
         });
     },
     deleteUser(userId) {
@@ -76,10 +87,30 @@ export default {
       axios.delete(`${BASE_API_URL}/users/${userId}/`, config)
         .then(() => {
           this.getUsersList();
+        })
+        .catch((e) => {
+          if (e.response.status === 401) {
+            const tokenRefresh = localStorage.getItem('jwt_token_refresh');
+            this.$store.dispatch('refreshToken', tokenRefresh);
+            const isLogged = this.$store.getters.getIsLoggedIn;
+            if (isLogged !== true) {
+              router.push({ path: '/login', query: { text: 'true' } });
+            } else {
+              console.log('refreshToken');
+              this.deleteUser(userId);
+            }
+          }
         });
     },
   },
   mounted() {
+    const isLogIn = this.$store.getters.getIsLoggedIn;
+    console.log(isLogIn);
+    if (isLogIn !== true) {
+      console.log('не авторизован');
+      this.$store.dispatch('logout');
+      router.push({ path: '/login', query: { text: 'true' } });
+    }
     this.getUsersList();
   },
 };
