@@ -197,7 +197,6 @@ export default {
             if (isLogged !== true) {
               router.push({ path: '/login', query: { text: 'true' } });
             } else {
-              console.log('refreshToken');
               this.deleteQuestionInProject(questionId);
             }
           }
@@ -230,14 +229,12 @@ export default {
             if (isLogged !== true) {
               router.push({ path: '/login', query: { text: 'true' } });
             } else {
-              console.log('refreshToken');
               this.getProjectData();
             }
           }
         });
     },
     saveChanges() {
-      console.log(this.owner);
       const config = {
         headers: {
           Authorization: `Bearer ${this.jwt}`,
@@ -258,8 +255,7 @@ export default {
         question: this.question,
       };
       axios.put(`${BASE_API_URL}/projects/${this.$route.params.id}/`, changedProjectData, config)
-        .then((response) => {
-          console.log(response);
+        .then(() => {
           router.push('/admin-area/main');
         })
         .catch((e) => {
@@ -270,7 +266,6 @@ export default {
             if (isLogged !== true) {
               router.push({ path: '/login', query: { text: 'true' } });
             } else {
-              console.log('refreshToken');
               this.saveChanges();
             }
           }
@@ -279,7 +274,6 @@ export default {
   },
   mounted() {
     const isLogIn = this.$store.getters.getIsLoggedIn;
-    console.log(isLogIn);
     if (isLogIn !== true) {
       console.log('не авторизован');
       this.$store.dispatch('logout');

@@ -56,11 +56,9 @@ export default {
       };
       axios.post(AUTH_URL, requestData, config)
         .then((response) => {
-          console.log(response.data);
           const jwtAccess = response.data.access;
           const jwtRefresh = response.data.refresh;
           localStorage.setItem('jwt_token', jwtAccess);
-          console.log(jwtRefresh);
           localStorage.setItem('jwt_token_refresh', jwtRefresh);
           const decodeToken = jwtDecode(response.data.access);
           const username = decodeToken.name;
@@ -91,6 +89,7 @@ export default {
     },
   },
   mounted() {
+    this.info = '';
     if (!this.$store.state.user) {
       localStorage.removeItem('jwt_token');
       localStorage.removeItem('jwt_token_refresh');

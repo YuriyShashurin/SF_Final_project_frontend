@@ -103,15 +103,12 @@ export default {
             if (isLogged !== true) {
               router.push({ path: '/login', query: { text: 'true' } });
             } else {
-              console.log('refreshToken');
               this.getQuestionData();
             }
           }
         })
         .then((response) => {
-          console.log(response.data);
           this.questionsList = response.data;
-          console.log(this.questionsList);
         });
     },
     addQuestionInSurvey() {
@@ -121,7 +118,6 @@ export default {
         question: questionId,
         weight: this.weight,
       };
-      console.log(surveyData);
       axios.post(`${BASE_API_URL}/surveys/`, surveyData, this.getConfig)
         .then(() => {
           this.selectedQuestion = null;
@@ -136,7 +132,6 @@ export default {
             if (isLogged !== true) {
               router.push({ path: '/login', query: { text: 'true' } });
             } else {
-              console.log('refreshToken');
               this.addQuestionInSurvey();
             }
           }
@@ -145,7 +140,6 @@ export default {
   },
   mounted() {
     const isLogIn = this.$store.getters.getIsLoggedIn;
-    console.log(isLogIn);
     if (isLogIn !== true) {
       console.log('не авторизован');
       this.$store.dispatch('logout');

@@ -101,7 +101,6 @@ export default {
             if (isLogged !== true) {
               router.push({ path: '/login', query: { text: 'true' } });
             } else {
-              console.log('refreshToken');
               this.getQuestionsAnwersData();
             }
           }
@@ -128,7 +127,6 @@ export default {
             if (isLogged !== true) {
               router.push({ path: '/login', query: { text: 'true' } });
             } else {
-              console.log('refreshToken');
               this.addQuestionInProject(questionId, config);
             }
           }
@@ -169,7 +167,6 @@ export default {
             if (isLogged !== true) {
               router.push({ path: '/login', query: { text: 'true' } });
             } else {
-              console.log('refreshToken');
               this.createQuestion();
             }
           }
@@ -207,7 +204,6 @@ export default {
             if (isLogged !== true) {
               router.push({ path: '/login', query: { text: 'true' } });
             } else {
-              console.log('refreshToken');
               this.addAnswer();
             }
           }
@@ -216,7 +212,6 @@ export default {
   },
   mounted() {
     const isLogIn = this.$store.getters.getIsLoggedIn;
-    console.log(isLogIn);
     if (isLogIn !== true) {
       console.log('не авторизован');
       this.$store.dispatch('logout');

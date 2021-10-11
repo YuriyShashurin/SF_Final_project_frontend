@@ -18,7 +18,7 @@ export default {
   methods: {
     submitLogout() {
       this.$store.dispatch('logout');
-      router.push('/');
+      router.push('/login');
     },
     cancelLogout() {
       router.push('/');

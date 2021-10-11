@@ -90,7 +90,6 @@ export default {
       axios.get(`${BASE_API_URL}/users/${userId}`, config)
         .then((response) => {
           this.userObject = response.data;
-          console.log(this.userObject);
         })
         .catch((e) => {
           if (e.response.status === 401) {
@@ -100,7 +99,6 @@ export default {
             if (isLogged !== true) {
               router.push({ path: '/login', query: { text: 'true' } });
             } else {
-              console.log('refreshToken');
               this.getUserObject();
             }
           }
@@ -113,7 +111,6 @@ export default {
           Authorization: `Bearer ${jwt}`,
         },
       };
-      console.log(jwt);
       const NewProjectData = {
         owner: this.userObject,
         owner_id: this.userObject.id,
@@ -127,7 +124,6 @@ export default {
 
       axios.post(`${BASE_API_URL}/projects/`, NewProjectData, config)
         .then((response) => {
-          console.log(response);
           this.projectId = response.data.id;
           router.push({ name: 'ProjectDetails', params: { id: this.projectId } });
         })
@@ -139,7 +135,6 @@ export default {
             if (isLogged !== true) {
               router.push({ path: '/login', query: { text: 'true' } });
             } else {
-              console.log('refreshToken');
               this.createProject();
             }
           }
@@ -148,7 +143,6 @@ export default {
   },
   mounted() {
     const isLogIn = this.$store.getters.getIsLoggedIn;
-    console.log(isLogIn);
     if (isLogIn !== true) {
       console.log('не авторизован');
       this.$store.dispatch('logout');

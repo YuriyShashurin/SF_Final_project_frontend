@@ -103,7 +103,6 @@ export default {
             if (isLogged !== true) {
               router.push({ path: '/login', query: { text: 'true' } });
             } else {
-              console.log('refreshToken');
               this.getSurveyList();
             }
           }
@@ -115,7 +114,6 @@ export default {
   },
   mounted() {
     const isLogIn = this.$store.getters.getIsLoggedIn;
-    console.log(isLogIn);
     if (isLogIn !== true) {
       console.log('не авторизован');
       this.$store.dispatch('logout');

@@ -76,13 +76,11 @@ export default {
         })
         .then((response) => {
           this.questionsList = response.data;
-          console.log(this.questionsList);
         });
     },
   },
   mounted() {
     const isLogIn = this.$store.getters.getIsLoggedIn;
-    console.log(isLogIn);
     if (isLogIn !== true) {
       console.log('не авторизован');
       this.$store.dispatch('logout');

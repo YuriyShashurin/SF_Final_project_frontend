@@ -82,9 +82,7 @@ export default {
       };
 
       axios.post(`${BASE_API_URL}/users/`, requestData, config)
-        .then((response) => {
-          console.log('asd');
-          console.log(response);
+        .then(() => {
           this.username = '';
           this.password_check = '';
           this.password = '';
@@ -92,8 +90,7 @@ export default {
           this.first_name = '';
           router.push({ path: '/' });
         })
-        .catch((e) => {
-          console.log(e);
+        .catch(() => {
           this.alert_message = 'Введены неверные данные. Попробуйте снова';
           this.username = '';
           this.password_check = '';

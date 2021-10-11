@@ -138,7 +138,6 @@ export default {
             if (isLogged !== true) {
               router.push({ path: '/login', query: { text: 'true' } });
             } else {
-              console.log('refreshToken');
               this.setQuestionWeight();
             }
           }
@@ -167,7 +166,6 @@ export default {
     },
     getSurveyData() {
       axios.get(`${BASE_API_URL}/projects/${this.$route.params.id}/`, this.getConfig).then((response) => {
-        console.log('getSurveyData');
         this.surveyData = response.data.question;
         this.projectName = response.data.title;
         this.maxNumber = this.surveyData.length;
@@ -188,7 +186,6 @@ export default {
           if (isLogged !== true) {
             router.push({ path: '/login', query: { text: 'true' } });
           } else {
-            console.log('refreshToken');
             this.getSurveyData();
           }
         }
@@ -218,7 +215,6 @@ export default {
             if (isLogged !== true) {
               router.push({ path: '/login', query: { text: 'true' } });
             } else {
-              console.log('refreshToken');
               this.sendAnswerData(questionId, answerId, value);
             }
           }
@@ -249,7 +245,6 @@ export default {
             if (isLogged !== true) {
               router.push({ path: '/login', query: { text: 'true' } });
             } else {
-              console.log('refreshToken');
               this.addLastQuestionAndScore(startNumber);
             }
           }
@@ -299,7 +294,6 @@ export default {
             console.log('Completed');
             router.push({ name: 'YetComplete' });
           } else {
-            console.log('In progress');
             this.projectStatus = response.data;
             this.startNumber = this.projectStatus.last_question;
             this.limitNumber = this.startNumber + 1;
@@ -307,7 +301,6 @@ export default {
             this.answerScore = response.data.answer_score;
             this.time = response.data.time;
             this.currentLifeTime = response.data.remaining_time;
-            console.log('Canse');
           }
         })
         .catch((e) => {
@@ -332,7 +325,6 @@ export default {
                   if (isLogged !== true) {
                     router.push({ path: '/login', query: { text: 'true' } });
                   } else {
-                    console.log('refreshToken');
                     this.checkSurveyStatus();
                   }
                 }
@@ -366,11 +358,9 @@ export default {
     }
     if (this.usetest === true) {
       this.testtext = 'Внимание. Вы проходите тестовую версию анкеты. Результаты не сохраняются';
-      console.log('тестовая анкета');
     } else {
       this.checkSurveyStatus();
     }
-    console.log('getSurveyData');
     this.getSurveyData();
   },
   unmounted() {

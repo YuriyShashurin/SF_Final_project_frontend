@@ -60,7 +60,6 @@ export default {
       axios.get(`${BASE_API_URL}/users/`, config)
         .then((response) => {
           this.users = response.data;
-          console.log(this.users);
         })
         .catch((e) => {
           if (e.response.status === 401) {
@@ -70,14 +69,12 @@ export default {
             if (isLogged !== true) {
               router.push({ path: '/login', query: { text: 'true' } });
             } else {
-              console.log('refreshToken');
               this.getUsersList();
             }
           }
         });
     },
     deleteUser(userId) {
-      console.log(userId);
       const jwt = localStorage.getItem('jwt_token');
       const config = {
         headers: {
@@ -96,7 +93,6 @@ export default {
             if (isLogged !== true) {
               router.push({ path: '/login', query: { text: 'true' } });
             } else {
-              console.log('refreshToken');
               this.deleteUser(userId);
             }
           }
@@ -105,7 +101,6 @@ export default {
   },
   mounted() {
     const isLogIn = this.$store.getters.getIsLoggedIn;
-    console.log(isLogIn);
     if (isLogIn !== true) {
       console.log('не авторизован');
       this.$store.dispatch('logout');
