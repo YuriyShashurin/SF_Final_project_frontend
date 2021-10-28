@@ -52,7 +52,6 @@
     </form>
     <button v-on:click="createProject" class="btn btn-info mt-4">Создать проект</button>
   </div>
-  <div> {{ isActive}}</div>
 </template>
 
 <script>
