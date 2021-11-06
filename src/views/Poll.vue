@@ -90,6 +90,25 @@ export default {
       this.setQuestionWeight();
       return this.weight;
     },
+    setGetConfig() {
+      const jwt = localStorage.getItem('jwt_token');
+      const getConfig = {
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        },
+      };
+      return getConfig;
+    },
+    setPostConfig() {
+      const jwt = localStorage.getItem('jwt_token');
+      const postConfig = {
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+          'X-CSRFToken': this.$cookies.get('csrftoken'),
+        },
+      };
+      return postConfig;
+    },
   },
   data() {
     return {
@@ -115,9 +134,6 @@ export default {
       currentQuestionId: null,
       weight: null,
       totalWeight: 0,
-      jwt: null,
-      getConfig: null,
-      postConfig: null,
       answerScore: 0,
       time: 0,
       timerRun: true,
@@ -126,7 +142,12 @@ export default {
   methods: {
     setQuestionWeight() {
       const questionId = this.surveyData[this.startNumber];
-      axios.get(`${BASE_API_URL}/surveys/?question=${questionId.id}&project=${this.$route.params.id}`, this.getConfig)
+      const config = {
+        headers: {
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
+        },
+      };
+      axios.get(`${BASE_API_URL}/surveys/?question=${questionId.id}&project=${this.$route.params.id}`, config)
         .then((response) => {
           const data = response.data[0];
           this.weight = data.weight;
@@ -165,7 +186,12 @@ export default {
       return percent;
     },
     getSurveyData() {
-      axios.get(`${BASE_API_URL}/projects/${this.$route.params.id}/`, this.getConfig).then((response) => {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
+        },
+      };
+      axios.get(`${BASE_API_URL}/projects/${this.$route.params.id}/`, config).then((response) => {
         this.surveyData = response.data.question;
         this.projectName = response.data.title;
         this.maxNumber = this.surveyData.length;
@@ -204,7 +230,13 @@ export default {
         survey_status: surveyStatus,
         user_answers: answerData,
       };
-      axios.post(`${BASE_API_URL}/answers_in_project/`, respondentsAnswerData, this.postConfig)
+      const config = {
+        headers: {
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
+          'X-CSRFToken': this.$cookies.get('csrftoken'),
+        },
+      };
+      axios.post(`${BASE_API_URL}/answers_in_project/`, respondentsAnswerData, config)
         .then(() => {
           this.answerScore += value;
         }).catch((e) => {
@@ -234,7 +266,13 @@ export default {
       this.projectStatus.answer_score = this.answerScore;
       this.projectStatus.time = this.time;
       this.projectStatus.remaining_time = this.lifeTime;
-      axios.put(`${BASE_API_URL}/project_status/${apiId}/`, this.projectStatus, this.getConfig)
+      const config = {
+        headers: {
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
+          'X-CSRFToken': this.$cookies.get('csrftoken'),
+        },
+      };
+      axios.put(`${BASE_API_URL}/project_status/${apiId}/`, this.projectStatus, config)
         .then((response) => {
           console.log('setquetion', response);
         }).catch((e) => {
@@ -287,7 +325,12 @@ export default {
       const userID = this.userId;
       const projectID = this.$route.params.id;
       const apiId = `${projectID}_${userID}`;
-      axios.get(`${BASE_API_URL}/project_status/${apiId}/`, this.getConfig)
+      const config = {
+        headers: {
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
+        },
+      };
+      axios.get(`${BASE_API_URL}/project_status/${apiId}/`, config)
         .then((response) => {
           console.log(response.data);
           if (response.data.status === 'Complete') {
@@ -314,7 +357,13 @@ export default {
               project_score: 0,
               answer_score: 0,
             };
-            axios.post(`${BASE_API_URL}/project_status/`, requestData, this.postConfig)
+            const configP = {
+              headers: {
+                Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
+                'X-CSRFToken': this.$cookies.get('csrftoken'),
+              },
+            };
+            axios.post(`${BASE_API_URL}/project_status/`, requestData, configP)
               .then((response) => {
                 console.log('Создаем статус участия');
                 this.projectStatus = response.data;
@@ -340,18 +389,6 @@ export default {
       this.$store.dispatch('logout');
       router.push({ path: '/login', query: { text: 'true' } });
     }
-    this.jwt = localStorage.getItem('jwt_token');
-    this.getConfig = {
-      headers: {
-        Authorization: `Bearer ${this.jwt}`,
-      },
-    };
-    this.postConfig = {
-      headers: {
-        Authorization: `Bearer ${this.jwt}`,
-        'X-CSRFToken': this.$cookies.get('csrftoken'),
-      },
-    };
     this.userId = this.$store.getters.getUserId;
     if (this.$route.query.usetest) {
       this.usetest = true;

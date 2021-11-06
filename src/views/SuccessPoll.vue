@@ -36,11 +36,10 @@ export default {
       const projectID = this.$route.params.id;
       const userID = this.$route.query.resp;
       const apiId = `${projectID}_${userID}`;
-
-      const jwt = localStorage.getItem('jwt_token');
       const config = {
         headers: {
-          Authorization: `Bearer ${jwt}`,
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
+          'X-CSRFToken': this.$cookies.get('csrftoken'),
         },
       };
       const putData = {
@@ -69,10 +68,10 @@ export default {
     },
     checkCompleteStatus() {
       const status = this.$route.query.q;
-      const jwt = localStorage.getItem('jwt_token');
       const config = {
         headers: {
-          Authorization: `Bearer ${jwt}`,
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
+          'X-CSRFToken': this.$cookies.get('csrftoken'),
         },
       };
 

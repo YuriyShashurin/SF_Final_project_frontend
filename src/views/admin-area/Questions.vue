@@ -53,13 +53,11 @@ export default {
   },
   methods: {
     getQuestionsData() {
-      const jwt = localStorage.getItem('jwt_token');
       const config = {
         headers: {
-          Authorization: `Bearer ${jwt}`,
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
         },
       };
-
       axios.get(`${BASE_API_URL}/questions/`, config)
         .catch((e) => {
           if (e.response.status === 401) {

@@ -50,10 +50,9 @@ export default {
   },
   methods: {
     getUsersList() {
-      const jwt = localStorage.getItem('jwt_token');
       const config = {
         headers: {
-          Authorization: `Bearer ${jwt}`,
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
         },
       };
 
@@ -75,10 +74,9 @@ export default {
         });
     },
     deleteUser(userId) {
-      const jwt = localStorage.getItem('jwt_token');
       const config = {
         headers: {
-          Authorization: `Bearer ${jwt}`,
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
         },
       };
       axios.delete(`${BASE_API_URL}/users/${userId}/`, config)

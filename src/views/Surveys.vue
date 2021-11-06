@@ -3,6 +3,7 @@
     <h4 class="card-header text-white">
       Доступные опросы
     </h4>
+    <div> {{noProjects}}</div>
     <div
          v-for="survey in survey_list"
          :key="survey.id">
@@ -33,6 +34,7 @@ export default {
       userId: null,
       current: null,
       completedProjects: [],
+      noProjects: '',
     };
   },
   methods: {
@@ -50,15 +52,18 @@ export default {
       return date;
     },
     getSurveyList() {
-      const jwt = localStorage.getItem('jwt_token');
+      this.noProjects = '';
       const config = {
         headers: {
-          Authorization: `Bearer ${jwt}`,
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
         },
       };
 
       axios.get(`${BASE_API_URL}/projects/?available=true&user_id=${this.userId}`, config).then((response) => {
         this.survey_list = response.data;
+        if (this.survey_list.length < 1) {
+          this.noProjects = 'В данный момент нет доступных для вас опросов.';
+        }
       }).catch((e) => {
         if (e.response.status === 401) {
           const tokenRefresh = localStorage.getItem('jwt_token_refresh');
@@ -74,6 +79,7 @@ export default {
     },
   },
   created() {
+    this.noProjects = '';
     const isLogIn = this.$store.getters.getIsLoggedIn;
     if (isLogIn !== true) {
       console.log('не авторизован');

@@ -66,7 +66,12 @@ export default {
   },
   methods: {
     getOthersComplete() {
-      axios.get(`${BASE_STATS_URL}/time_stats/${this.projectNumber}/${this.time}`, this.getConfig)
+      const config = {
+        headers: {
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
+        },
+      };
+      axios.get(`${BASE_STATS_URL}/time_stats/${this.projectNumber}/${this.time}`, config)
         .then((response) => {
           this.moreTime = response.data.more_answers_time_persent;
         })
@@ -78,12 +83,11 @@ export default {
             if (isLogged !== true) {
               router.push({ path: '/login', query: { text: 'true' } });
             } else {
-              console.log('refreshToken');
               this.getOthersComplete();
             }
           }
         });
-      axios.get(`${BASE_STATS_URL}/score_stats/${this.projectNumber}/${this.answerScore}`, this.getConfig)
+      axios.get(`${BASE_STATS_URL}/score_stats/${this.projectNumber}/${this.answerScore}`, config)
         .then((response) => {
           this.moreAnswersScore = response.data.more_answers_score_persent;
           console.log(this.moreAnswersScore);
@@ -96,7 +100,6 @@ export default {
             if (isLogged !== true) {
               router.push({ path: '/login', query: { text: 'true' } });
             } else {
-              console.log('refreshToken');
               this.getOthersComplete();
             }
           }
@@ -105,7 +108,12 @@ export default {
     getCurrentStatus() {
       this.projectNumber = this.project;
       const apiId = `${this.projectNumber}_${this.userId}`;
-      axios.get(`${BASE_API_URL}/${apiId}/`, this.getConfig)
+      const config = {
+        headers: {
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
+        },
+      };
+      axios.get(`${BASE_API_URL}/${apiId}/`, config)
         .then((response) => {
           this.respStatus = response.data;
           this.time = this.respStatus.time;
@@ -121,7 +129,6 @@ export default {
             if (isLogged !== true) {
               router.push({ path: '/login', query: { text: 'true' } });
             } else {
-              console.log('refreshToken');
               this.getCurrentStatus();
             }
           }
@@ -130,21 +137,13 @@ export default {
   },
   mounted() {
     const isLogIn = this.$store.getters.getIsLoggedIn;
-    console.log(isLogIn);
     if (isLogIn !== true) {
       console.log('не авторизован');
       this.$store.dispatch('logout');
       router.push({ path: '/login', query: { text: 'true' } });
     }
-    this.jwt = localStorage.getItem('jwt_token');
-    this.getConfig = {
-      headers: {
-        Authorization: `Bearer ${this.jwt}`,
-      },
-    };
     this.projectNumber = this.project;
     this.getCurrentStatus();
-    console.log('create');
   },
   updated() {
     if (this.projectNumber !== this.project) {

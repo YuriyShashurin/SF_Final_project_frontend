@@ -62,9 +62,7 @@ export default {
       startNumber: 0,
       limitNumber: 10,
       maxNumber: null,
-      jwt: null,
       userId: null,
-      getConfig: null,
       selectedSurvey: null,
     };
   },
@@ -104,7 +102,12 @@ export default {
     },
     getCompletedInterviews() {
       const status = 'Complete';
-      axios.get(`${BASE_API_URL}?status=${status}&user_id=${this.userId}`, this.getConfig)
+      const config = {
+        headers: {
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
+        },
+      };
+      axios.get(`${BASE_API_URL}?status=${status}&user_id=${this.userId}`, config)
         .then((response) => {
           this.completedSurveys = response.data;
           this.maxNumber = this.completedSurveys.length;
@@ -125,19 +128,12 @@ export default {
   },
   created() {
     const isLogIn = this.$store.getters.getIsLoggedIn;
-    console.log(isLogIn);
     if (isLogIn !== true) {
       console.log('не авторизован');
       this.$store.dispatch('logout');
       router.push({ path: '/login', query: { text: 'true' } });
     }
-    this.jwt = localStorage.getItem('jwt_token');
     this.userId = this.$store.getters.getUserId;
-    this.getConfig = {
-      headers: {
-        Authorization: `Bearer ${this.jwt}`,
-      },
-    };
     this.getCompletedInterviews();
   },
 };

@@ -87,10 +87,9 @@ export default {
   },
   methods: {
     getSurveyList() {
-      const jwt = localStorage.getItem('jwt_token');
       const config = {
         headers: {
-          Authorization: `Bearer ${jwt}`,
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
         },
       };
 

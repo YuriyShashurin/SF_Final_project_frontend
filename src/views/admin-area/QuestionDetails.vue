@@ -60,13 +60,27 @@ export default {
       help_desc: '',
       answerOption: [],
       type_display: '',
-      jwt: null,
-      getConfig: {},
     };
+  },
+  computed: {
+    setGetConfig() {
+      const jwt = localStorage.getItem('jwt_token');
+      const getConfig = {
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        },
+      };
+      return getConfig;
+    },
   },
   methods: {
     getQuestionData() {
-      axios.get(`${BASE_API_URL}/questions/${this.$route.params.id}/`, this.getConfig)
+      const config = {
+        headers: {
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
+        },
+      };
+      axios.get(`${BASE_API_URL}/questions/${this.$route.params.id}/`, config)
         .then((response) => {
           this.title = response.data.title;
           this.type = response.data.type;
@@ -95,12 +109,6 @@ export default {
       this.$store.dispatch('logout');
       router.push({ path: '/login', query: { text: 'true' } });
     }
-    this.jwt = localStorage.getItem('jwt_token');
-    this.getConfig = {
-      headers: {
-        Authorization: `Bearer ${this.jwt}`,
-      },
-    };
     this.getQuestionData();
   },
 };

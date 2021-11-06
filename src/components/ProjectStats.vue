@@ -70,11 +70,8 @@ export default {
     return {
       href: '',
       defaultHref: `${BASE_DOWNLOAD_FILE_URL}/project/`,
-      jwt: null,
       statusData: [],
       projectStatusData: [],
-      csrf: null,
-      config: null,
       response: 0,
       completed: 0,
       incompleted: 0,
@@ -92,7 +89,12 @@ export default {
       });
     },
     getInterviewsData() {
-      axios.get(`${BASE_API_URL}/project_status/`, this.config)
+      const config = {
+        headers: {
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
+        },
+      };
+      axios.get(`${BASE_API_URL}/project_status/`, config)
         .catch((e) => {
           console.log('error', e);
         })
@@ -119,10 +121,12 @@ export default {
         });
     },
     deleteParticipation(id) {
-      axios.delete(`${BASE_API_URL}/project_status/${id}/`)
-        .catch((e) => {
-          console.log('error', e);
-        })
+      const config = {
+        headers: {
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
+        },
+      };
+      axios.delete(`${BASE_API_URL}/project_status/${id}/`, config)
         .catch((e) => {
           if (e.response.status === 401) {
             const tokenRefresh = localStorage.getItem('jwt_token_refresh');
@@ -147,14 +151,6 @@ export default {
       router.push({ path: '/login', query: { text: 'true' } });
     }
     this.href = `${BASE_DOWNLOAD_FILE_URL}/project/${this.id}/`;
-    this.csrf = this.$cookies.get('csrftoken');
-    this.jwt = localStorage.getItem('jwt_token');
-    this.config = {
-      headers: {
-        Authorization: `Bearer ${this.jwt}`,
-        'X-CSRFToken': this.csrf,
-      },
-    };
     this.getInterviewsData();
   },
 };

@@ -160,7 +160,6 @@ export default {
       isActive: false,
       questions: [],
       answersOfQuestion: [],
-      jwt: null,
       projectId: null,
       showQuestions: true,
       showStats: false,
@@ -177,14 +176,14 @@ export default {
       this.showStats = boolen;
     },
     deleteQuestionInProject(questionId) {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${this.jwt}`,
-        },
-      };
       const projectID = this.projectId;
       const question = questionId;
       const Id = `${projectID}_${question}`;
+      const config = {
+        headers: {
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
+        },
+      };
       axios.delete(`${BASE_API_URL}/surveys/${Id}/`, config)
         .then(() => {
           this.getProjectData();
@@ -205,7 +204,7 @@ export default {
     getProjectData() {
       const config = {
         headers: {
-          Authorization: `Bearer ${this.jwt}`,
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
         },
       };
       axios.get(`${BASE_API_URL}/projects/${this.$route.params.id}/`, config)
@@ -235,11 +234,6 @@ export default {
         });
     },
     saveChanges() {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${this.jwt}`,
-        },
-      };
       this.userId = this.$store.getters.getUserId;
       const changedProjectData = {
         id: this.id,
@@ -253,6 +247,12 @@ export default {
         life_time_value: this.lifeTimeValue,
         is_active: this.isActive,
         question: this.question,
+      };
+      const config = {
+        headers: {
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
+          'X-CSRFToken': this.$cookies.get('csrftoken'),
+        },
       };
       axios.put(`${BASE_API_URL}/projects/${this.$route.params.id}/`, changedProjectData, config)
         .then(() => {
@@ -280,7 +280,6 @@ export default {
       router.push({ path: '/login', query: { text: 'true' } });
     }
     this.projectId = this.$route.params.id;
-    this.jwt = localStorage.getItem('jwt_token');
     this.getProjectData();
   },
 };

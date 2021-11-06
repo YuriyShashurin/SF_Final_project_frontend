@@ -38,7 +38,7 @@
       <h5 class="mb-4">Добавление вариантов ответов</h5>
       <form class="d-flex flex-column">
         <div>
-          <label for="title" class="newText">Название вопроса</label>
+          <label for="title" class="newText">Название варианта ответа</label>
           <input type="text" v-model="newText" class="form-control" id="newText">
         </div>
         <div>
@@ -85,12 +85,13 @@ export default {
   },
   methods: {
     getQuestionsAnwersData() {
-      const jwt = localStorage.getItem('jwt_token');
       const config = {
         headers: {
-          Authorization: `Bearer ${jwt}`,
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
         },
       };
+      console.log('getQuestionsAnwersData');
+      console.log(config);
 
       axios.get(`${BASE_API_URL}/questions/`, config)
         .catch((e) => {
@@ -133,12 +134,10 @@ export default {
         });
     },
     createQuestion() {
-      const csrf = this.$cookies.get('csrftoken');
-      const jwt = localStorage.getItem('jwt_token');
       const config = {
         headers: {
-          Authorization: `Bearer ${jwt}`,
-          'X-CSRFToken': csrf,
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
+          'X-CSRFToken': this.$cookies.get('csrftoken'),
         },
       };
       if (this.type === 'single') {
@@ -173,12 +172,10 @@ export default {
         });
     },
     addAnswer() {
-      const csrf = this.$cookies.get('csrftoken');
-      const jwt = localStorage.getItem('jwt_token');
       const config = {
         headers: {
-          Authorization: `Bearer ${jwt}`,
-          'X-CSRFToken': csrf,
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
+          'X-CSRFToken': this.$cookies.get('csrftoken'),
         },
       };
       const answerData = {

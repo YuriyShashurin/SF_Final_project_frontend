@@ -74,10 +74,9 @@ export default {
         is_active: true,
       };
 
-      const csrf = this.$cookies.get('csrftoken');
       const config = {
         headers: {
-          'X-CSRFToken': csrf,
+          'X-CSRFToken': this.$cookies.get('csrftoken'),
         },
       };
 

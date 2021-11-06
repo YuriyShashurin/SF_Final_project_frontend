@@ -45,8 +45,6 @@ export default createStore({
       commit('logoutUser');
     },
     refreshToken: ({ commit }, refreshToken) => {
-      console.log('refresh');
-      console.log(refreshToken);
       const requestData = {
         refresh: refreshToken,
       };
@@ -59,13 +57,10 @@ export default createStore({
       const REFRESH_TOKEN_URL = process.env.VUE_APP_REFRESH_TOKEN_URL;
       axios.post(REFRESH_TOKEN_URL, requestData, config)
         .then((response) => {
-          console.log('access');
           const newToken = response.data.access;
           localStorage.setItem('jwt_token', newToken);
           commit('updateAccessToken', newToken);
-        }).catch((e) => {
-          console.log('fail');
-          console.log(e.response.status);
+        }).catch(() => {
           localStorage.removeItem('jwt_token');
           localStorage.removeItem('jwt_token_refresh');
           commit('logoutUser');
@@ -79,6 +74,7 @@ export default createStore({
     getUserId: (state) => state.userID,
     getIsLoggedIn: (state) => state.isLoggedIn,
     getIsStaff: (state) => state.isStaff,
+    getjwtAccess: (state) => state.jwtAccess,
   },
   plugins: [createPersistedState()],
 });

@@ -79,10 +79,9 @@ export default {
   },
   methods: {
     getUserObject() {
-      const jwt = localStorage.getItem('jwt_token');
       const config = {
         headers: {
-          Authorization: `Bearer ${jwt}`,
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
         },
       };
       const userId = this.$store.getters.getUserId;
@@ -104,10 +103,9 @@ export default {
         });
     },
     createProject() {
-      const jwt = localStorage.getItem('jwt_token');
       const config = {
         headers: {
-          Authorization: `Bearer ${jwt}`,
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
         },
       };
       const NewProjectData = {

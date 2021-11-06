@@ -84,8 +84,6 @@ export default {
     return {
       selectedQuestion: null,
       questionsList: [],
-      csrf: null,
-      jwt: null,
       getConfig: {},
       accessText: '',
       weight: null,
@@ -94,7 +92,12 @@ export default {
   },
   methods: {
     getQuestionData() {
-      axios.get(`${BASE_API_URL}/questions/`, this.getConfig)
+      const config = {
+        headers: {
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
+        },
+      };
+      axios.get(`${BASE_API_URL}/questions/`, config)
         .catch((e) => {
           if (e.response.status === 401) {
             const tokenRefresh = localStorage.getItem('jwt_token_refresh');
@@ -118,7 +121,13 @@ export default {
         question: questionId,
         weight: this.weight,
       };
-      axios.post(`${BASE_API_URL}/surveys/`, surveyData, this.getConfig)
+      const config = {
+        headers: {
+          Authorization: `Bearer ${this.$store.getters.getjwtAccess}`,
+          'X-CSRFToken': this.$cookies.get('csrftoken'),
+        },
+      };
+      axios.post(`${BASE_API_URL}/surveys/`, surveyData, config)
         .then(() => {
           this.selectedQuestion = null;
           this.weight = null;
@@ -146,14 +155,6 @@ export default {
       router.push({ path: '/login', query: { text: 'true' } });
     }
     this.projectId = this.$route.query.ProjectId;
-    this.csrf = this.$cookies.get('csrftoken');
-    this.jwt = localStorage.getItem('jwt_token');
-    this.getConfig = {
-      headers: {
-        Authorization: `Bearer ${this.jwt}`,
-        'X-CSRFToken': this.csrf,
-      },
-    };
     this.getQuestionData();
   },
 };
